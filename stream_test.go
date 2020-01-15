@@ -67,3 +67,11 @@ func Test_flush_buffer_should_stop_grow_buffer(t *testing.T) {
 	should := require.New(t)
 	should.Equal(8, writer.bufferSize)
 }
+
+func Test_available(t *testing.T) {
+	should := require.New(t)
+	stream := NewStream(ConfigDefault, nil, 4)
+	should.Equal(4, stream.Available())
+	stream.WriteRaw("abcd")
+	should.Equal(0, stream.Available())
+}
