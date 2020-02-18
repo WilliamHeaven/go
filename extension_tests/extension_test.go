@@ -1,6 +1,7 @@
 package test
 
 import (
+    "fmt"
 	"github.com/json-iterator/go"
 	"github.com/modern-go/reflect2"
 	"github.com/stretchr/testify/require"
@@ -117,4 +118,36 @@ func (encoder *funcEncoder) IsEmpty(ptr unsafe.Pointer) bool {
 		return false
 	}
 	return encoder.isEmptyFunc(ptr)
+}
+
+func Test_RegisterFieldEncoder(t *testing.T) {
+    should := require.New(t)
+    type testStruct3 struct {
+        Field1 string
+        Field2 uint
+    }
+    jsoniter.RegisterFieldEncoder(reflect2.TypeOf(testStruct3{}).String(), "Field1", &wrapEncoder{
+        func(ptr unsafe.Pointer, stream *jsoniter.Stream) {
+            stream.WriteString("Field1_" + *((*string)(ptr)))
+        }, nil,
+    })
+    result, err := jsoniter.MarshalToString(testStruct3{"F1", 100})
+    should.Nil(err)
+    should.Equal(`{"Field1":"Field1_F1","Field2":100}`, fmt.Sprint(result))
+}
+
+type wrapEncoder struct {
+    encodeFunc func(ptr unsafe.Pointer, stream *jsoniter.Stream)
+    isEmptyFunc func(ptr unsafe.Pointer) bool 
+}
+
+func (enc *wrapEncoder) Encode(ptr unsafe.Pointer, stream *jsoniter.Stream){
+    enc.encodeFunc(ptr, stream)
+}
+
+func (enc *wrapEncoder) IsEmpty(ptr unsafe.Pointer) bool {
+    if enc.isEmptyFunc == nil {
+        return false
+    }
+    return enc.isEmptyFunc(ptr)
 }
