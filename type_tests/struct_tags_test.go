@@ -121,10 +121,10 @@ func init() {
 			F1 int32 `json:"F1"`
 			F2 int32 `json:"F2,string"`
 		})(nil),
-		(*struct {
-			F1 string `json:"F1"`
-			F2 string `json:"F2,string"`
-		})(nil),
+		// (*struct {
+		// 	F1 string `json:"F1"`
+		// 	F2 string `json:"F2,string"`
+		// })(nil),
 		(*struct {
 			F1 uint8 `json:"F1"`
 			F2 uint8 `json:"F2,string"`
